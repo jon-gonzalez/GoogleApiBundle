@@ -20,27 +20,78 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('happy_r_google_api');
 
-        $rootNode
-          ->children()
-            ->scalarNode('application_name')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('oauth2_client_id')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('oauth2_client_secret')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('oauth2_redirect_uri')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('developer_key')->isRequired()->cannotBeEmpty()->end()
-            ->scalarNode('site_name')->isRequired()->cannotBeEmpty()->end()
+        $this->addAuthTypeNode($rootNode);
 
-            ->scalarNode('authClass')->end()
-            ->scalarNode('ioClass')->end()
-            ->scalarNode('cacheClass')->end()
-            ->scalarNode('basePath')->end()
-            ->scalarNode('ioFileCache_directory')->end()
-          //end rootnode children
-          ->end();
+        $rootNode
+            ->children()
+                ->append($this->addWebServerAuthNode())
+                ->append($this->addServiceAccountAuthNode())
+                ->end()
+            ->end();
+          
 
         //let use the api defaults
         //$this->addServicesSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addAuthTypeNode(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->children()
+                ->scalarNode('auth_type')->isRequired()->cannotBeEmpty()->defaultValue('all')->end()
+            ->end();
+    }
+
+    private function addWebServerAuthNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $node = $treeBuilder->root('web_server_auth');
+
+        $node
+            ->children()
+                ->scalarNode('application_name')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('oauth2_client_id')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('oauth2_client_secret')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('oauth2_redirect_uri')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('developer_key')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('site_name')->isRequired()->cannotBeEmpty()->end()
+
+                ->scalarNode('authClass')->end()
+                ->scalarNode('ioClass')->end()
+                ->scalarNode('cacheClass')->end()
+                ->scalarNode('basePath')->end()
+                ->scalarNode('ioFileCache_directory')->end()
+            //end rootnode children
+            ->end();
+
+        return $node;
+    }
+
+    private function addServiceAccountAuthNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $node = $treeBuilder->root('service_account_auth');
+
+        $node
+            ->children()
+                ->scalarNode('application_name')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('oauth2_client_id')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('service_account_name')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('key_file_location')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('sub')->end()
+                ->arrayNode('scopes')->children()
+                    ->arrayNode('directory')
+                        ->prototype('scalar')->end()
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                ->end()
+            //end rootnode children
+            ->end();
+
+        return $node;
     }
 
 

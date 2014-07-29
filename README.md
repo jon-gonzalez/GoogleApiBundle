@@ -53,12 +53,27 @@ $bundles = array(
 # app/config/config.yml
 # you will get these parameters form https://code.google.com/apis/console/"
 happy_r_google_api:
-  application_name: MySite
-  oauth2_client_id: 
-  oauth2_client_secret: 
-  oauth2_redirect_uri: 
-  developer_key: 
-  site_name: mysite.com
+    auth_type: all
+    # Set up the auth system that you want to use. "all" if your application needs to use different types of auth.
+    # e.g auth_type: service_account_auth
+    web_server_auth:
+        application_name: AppName
+        oauth2_client_id: clientId
+        oauth2_client_secret: clientSecret
+        oauth2_redirect_uri: redirectUri
+        developer_key: developerKey
+        site_name: mysite.com
+
+    service_account_auth:
+        application_name: AppName
+        oauth2_client_id: clientId
+        service_account_name: something@developer.gserviceaccount.com
+        key_file_location: /path/to/your/file.p12 
+        # If you need to spectify a user who you are acting on behalf of, then set the 'sub' parameter.
+        # e.g. sub: emailaddress@yourdomain.com
+        scopes:
+            directory:
+                - "https://www.googleapis.com/auth/admin.directory.user"
 ```
 
 

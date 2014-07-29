@@ -6,5 +6,9 @@ services:
       arguments: [%happy_r_google_api%]
 
   happyr.google.api.analytics:
-    class: HappyR\Google\ApiBundle\Services\AnalyticsService
-    arguments: [@happyr.google.api.client]
+      class: HappyR\Google\ApiBundle\Services\AnalyticsService
+      arguments: [@happyr.google.api.client]
+
+  happyr.google.api.directory:
+      class: HappyR\Google\ApiBundle\Services\DirectoryService
+      arguments: [@happyr.google.api.client]

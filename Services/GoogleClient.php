@@ -17,6 +17,7 @@ class GoogleClient
      *
      */
     protected $client;
+    protected $config;
 
     /**
      *
@@ -26,18 +27,52 @@ class GoogleClient
     {
         // True if objects should be returned by the service classes.
         // False if associative arrays should be returned (default behavior).
-        $config['use_objects'] = true;
+        $this->config = $config;
+        $this->config['use_objects'] = true;
+        $this->client = new \Google_Client($this->config);
 
-        $client = new \Google_Client($config);
+        switch ($this->config['auth_type']) {
+            case 'web_server_auth':
+                $this->setWebServerAuth();
+                break;
+            
+            case 'service_account_auth':
+                $this->setServiceAuth();
+                break;
+        }
+    }
 
-        $client -> setApplicationName($config['application_name']);
-        $client -> setClientId($config['oauth2_client_id']);
-        $client -> setClientSecret($config['oauth2_client_secret']);
-        $client -> setRedirectUri($config['oauth2_redirect_uri']);
-        $client -> setDeveloperKey($config['developer_key']);
+    private function setWebServerAuth()
+    {
+        $this->client->setApplicationName($this->config['web_server_auth']['application_name']);
+        $this->client->setClientId($this->config['web_server_auth']['oauth2_client_id']);
+        $this->client->setClientSecret($this->config['web_server_auth']['oauth2_client_secret']);
+        $this->client->setRedirectUri($this->config['web_server_auth']['oauth2_redirect_uri']);
+        $this->client->setDeveloperKey($this->config['web_server_auth']['developer_key']);
+    }
 
-        $this -> client = $client;
+    private function setServiceAuth()
+    {
+        $applicationName = $this->config['service_account_auth']['application_name'];
+        $clientId = $this->config['service_account_auth']['oauth2_client_id'];
+        $serviceAccountName = $this->config['service_account_auth']['service_account_name'];
+        $scopes = $this->config['service_account_auth']['scopes']['directory'];
+        $sub = (isset($this->config['service_account_auth']['sub'])) ? $this->config['service_account_auth']['sub'] : false;
+        $keyFileLocation = $this->config['service_account_auth']['key_file_location'];
+        $key = file_get_contents($keyFileLocation);
 
+        $cred = new \Google_Auth_AssertionCredentials(
+            $serviceAccountName,
+            $scopes,
+            $key,
+            'notasecret',
+            'http://oauth.net/grant_type/jwt/1.0/bearer',
+            $sub
+        );
+
+        $this->client->setApplicationName($applicationName);
+        $this->client->setClientId($clientId);
+        $this->client->setAssertionCredentials($cred);
     }
 
     /**
