@@ -24,11 +24,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->append($this->addWebServerAuthNode())
-                ->append($this->addServiceAccountAuthNode())
-                ->end()
+            ->append($this->addAuthArrayNode())
+            ->end()
             ->end();
-          
 
         //let use the api defaults
         //$this->addServicesSection($rootNode);
@@ -42,6 +40,57 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('auth_type')->isRequired()->cannotBeEmpty()->defaultValue('all')->end()
             ->end();
+    }
+
+    private function addAuthArrayNode()
+    {
+        $treeBuilder = new TreeBuilder();
+        $node = $treeBuilder->root('auth');
+
+        $node
+             ->children()
+                    ->arrayNode('auth_clients')
+                    ->prototype('array')
+                        ->children()
+                            ->arrayNode('service_account_auth')
+                                ->children()
+                                    ->scalarNode('application_name')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('oauth2_client_id')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('service_account_name')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('key_file_location')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('sub')->end()
+                                    ->arrayNode('scopes')->children()
+                                    ->arrayNode('directory')
+                                    ->prototype('scalar')->end()
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                    ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('web_server_auth')
+                            ->children()
+                            ->scalarNode('application_name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('oauth2_client_id')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('oauth2_client_secret')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('oauth2_redirect_uri')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('developer_key')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('site_name')->isRequired()->cannotBeEmpty()->end()
+
+                            ->scalarNode('authClass')->end()
+                            ->scalarNode('ioClass')->end()
+                            ->scalarNode('cacheClass')->end()
+                            ->scalarNode('basePath')->end()
+                            ->scalarNode('ioFileCache_directory')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->end()
+            ->end();
+        return $node;
     }
 
     private function addWebServerAuthNode()

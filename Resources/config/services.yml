@@ -1,16 +1,21 @@
 services:
     happyr.google.api.client:
-        class: HappyR\Google\ApiBundle\Services\GoogleClient
-        arguments: [%happy_r_google_api%]
+        class:     HappyR\Google\ApiBundle\Services\GoogleClient
+        arguments: [%happy_r_google_api%, "learning"]
 
-    happyr.google.api.directory:
-        class: HappyR\Google\ApiBundle\Services\DirectoryService
-        arguments: [@happyr.google.api.client]
+    happyr.google.api.service.factory:
+        class:          HappyR\Google\ApiBundle\Services\GoogleServiceInterface
+        factory_class:  HappyR\Google\ApiBundle\Factory\GoogleServiceFactory
+        factory_method: create
 
     happyr.google.api.analytics:
-        class: HappyR\Google\ApiBundle\Services\AnalyticsService
-        arguments: [@happyr.google.api.client]
-    
+        parent:    happyr.google.api.service.factory
+        arguments: ["analytics", @happyr.google.api.client]
+
+    happyr.google.api.directory:
+        parent:    happyr.google.api.service.factory
+        arguments: ["directory", @happyr.google.api.client]
+
     happyr.google.api.youtube:
-        class: HappyR\Google\ApiBundle\Services\YoutubeService
-        arguments: [@happyr.google.api.client]
+        parent:    happyr.google.api.service.factory
+        arguments: ["youtube", @happyr.google.api.client]

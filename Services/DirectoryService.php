@@ -7,7 +7,7 @@ namespace HappyR\Google\ApiBundle\Services;
  *
  * This is the class that communicates with directory api
  */
-class DirectoryService extends \Google_Service_Directory
+class DirectoryService extends \Google_Service_Directory implements GoogleServiceInterface
 {
     /**
      * @var GoogleClient client

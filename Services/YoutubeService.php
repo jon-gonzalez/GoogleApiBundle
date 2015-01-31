@@ -7,7 +7,7 @@ namespace HappyR\Google\ApiBundle\Services;
  *
  * This is the class that communicates with YouTube api
  */
-class YoutubeService extends \Google_Service_YouTube
+class YoutubeService extends \Google_Service_YouTube implements GoogleServiceInterface
 {
     /**
      * @var GoogleClient client

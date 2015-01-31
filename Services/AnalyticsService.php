@@ -7,7 +7,7 @@ namespace HappyR\Google\ApiBundle\Services;
  *
  * This is the class that communicates with analytics api
  */
-class AnalyticsService extends \Google_Service_Analytics
+class AnalyticsService extends \Google_Service_Analytics implements GoogleServiceInterface
 {
     /**
      * @var GoogleClient client
