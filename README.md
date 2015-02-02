@@ -53,27 +53,71 @@ $bundles = array(
 # you will get these parameters form https://code.google.com/apis/console/"
 happy_r_google_api:
     auth_type: all
-    # Set up the auth system that you want to use. "all" if your application needs to use different types of auth.
+    # Set up the auth system that you want to use. [ web_server_auth / service_account_auth ]
     # e.g auth_type: service_account_auth
-    web_server_auth:
-        application_name: AppName
-        oauth2_client_id: clientId
-        oauth2_client_secret: clientSecret
-        oauth2_redirect_uri: redirectUri
-        developer_key: developerKey
-        site_name: mysite.com
-
-    service_account_auth:
-        application_name: AppName
-        oauth2_client_id: clientId
-        service_account_name: something@developer.gserviceaccount.com
-        key_file_location: /path/to/your/file.p12 
-        # If you need to spectify a user who you are acting on behalf of, then set the 'sub' parameter.
-        # e.g. sub: emailaddress@yourdomain.com
-        scopes:
-            directory:
-                - "https://www.googleapis.com/auth/admin.directory.user"
+    auth:
+        auth_clients:
+            # Array with multiple Google Account configurations. Use the key in order to loading your configuration.
+            "default":
+                web_server_auth:
+                    application_name: AppName
+                    oauth2_client_id: clientId
+                    oauth2_client_secret: clientSecret
+                    oauth2_redirect_uri: redirectUri
+                    developer_key: developerKey
+                    site_name: mysite.com
+                service_account_auth:
+                    application_name: AppName
+                    oauth2_client_id: clientId
+                    service_account_name: something@developer.gserviceaccount.com
+                    key_file_location: /path/to/your/file.p12
+                    # If you need to spectify a user who you are acting on behalf of, then set the 'sub' parameter.
+                    # e.g. sub: emailaddress@yourdomain.com
+                    scopes:
+                        directory:
+                            - "https://www.googleapis.com/auth/admin.directory.user"
+            "other-account":
+                web_server_auth:
+                    application_name: AppName
+                    oauth2_client_id: clientId
+                    oauth2_client_secret: clientSecret
+                    oauth2_redirect_uri: redirectUri
+                    developer_key: developerKey
+                    site_name: mysite.com
+                service_account_auth:
+                    application_name: AppName
+                    oauth2_client_id: clientId
+                    service_account_name: something@developer.gserviceaccount.com
+                    key_file_location: /path/to/your/file.p12
+                    # If you need to spectify a user who you are acting on behalf of, then set the 'sub' parameter.
+                    # e.g. sub: emailaddress@yourdomain.com
+                    scopes:
+                        directory:
+                            - "https://www.googleapis.com/auth/admin.directory.user"
 ```
 
+### Step 4: Configure your custom client and services [ Optional ]
+
+You can define your own services as follows:
+
+``` yaml
+# src/YourBundle/Resources/config/services.yml
+services:
+    happyr.google.api.client.default:
+        parent:    happyr.google.api.client.factory
+        arguments: [%happy_r_google_api%, "default"]
+
+    happyr.google.api.client.other_account:
+        parent:    happyr.google.api.client.factory
+        arguments: [%happy_r_google_api%, "other-account"]
+
+    happyr.google.api.directory.default:
+        parent:    happyr.google.api.service.factory
+        arguments: ["directory", @happyr.google.api.client.default]
+
+    happyr.google.api.directory.other_account:
+        parent:    happyr.google.api.service.factory
+        arguments: ["directory", @happyr.google.api.client.other_account]
+```
 
 [1]: https://github.com/google/google-api-php-client
