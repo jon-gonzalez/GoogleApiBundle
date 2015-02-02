@@ -14,59 +14,34 @@ class GoogleClient
      */
     protected $client;
     protected $config;
-    protected $auth;
 
     /**
+     * @param \Google_Client $client
      * @param array $config
-     * @param string $authClient
      */
-    public function __construct(array $config, $authClient = "default")
+    public function __construct(\Google_Client $client, array $config)
     {
-        // True if objects should be returned by the service classes.
-        // False if associative arrays should be returned (default behavior).
         $this->config = $config;
-        $this->config['use_objects'] = true;
-        $this->client = new \Google_Client();
-
-        $this->setAuthConfiguration($authClient);
-
-        switch ($this->config['auth_type']) {
-            case 'web_server_auth':
-                $this->setWebServerAuth();
-                break;
-            
-            case 'service_account_auth':
-                $this->setServiceAuth();
-                break;
-
-            case 'all':
-                echo "ALL";
-                break;
-        }
+        $this->client = $client;
     }
 
-    private function setAuthConfiguration($authClient)
+    public function setWebServerAuth()
     {
-        $this->auth = $this->config["auth"]["auth_clients"][$authClient];
+        $this->client->setApplicationName($this->config['application_name']);
+        $this->client->setClientId($this->config['oauth2_client_id']);
+        $this->client->setClientSecret($this->config['oauth2_client_secret']);
+        $this->client->setRedirectUri($this->config['oauth2_redirect_uri']);
+        $this->client->setDeveloperKey($this->config['developer_key']);
     }
 
-    private function setWebServerAuth()
+    public function setServiceAuth()
     {
-        $this->client->setApplicationName($this->auth['web_server_auth']['application_name']);
-        $this->client->setClientId($this->auth['web_server_auth']['oauth2_client_id']);
-        $this->client->setClientSecret($this->auth['web_server_auth']['oauth2_client_secret']);
-        $this->client->setRedirectUri($this->auth['web_server_auth']['oauth2_redirect_uri']);
-        $this->client->setDeveloperKey($this->auth['web_server_auth']['developer_key']);
-    }
-
-    private function setServiceAuth()
-    {
-        $applicationName = $this->auth['service_account_auth']['application_name'];
-        $clientId = $this->auth['service_account_auth']['oauth2_client_id'];
-        $serviceAccountName = $this->auth['service_account_auth']['service_account_name'];
-        $scopes = $this->auth['service_account_auth']['scopes']['directory'];
-        $sub = (isset($this->auth['service_account_auth']['sub'])) ? $this->auth['service_account_auth']['sub'] : false;
-        $keyFileLocation = $this->auth['service_account_auth']['key_file_location'];
+        $applicationName = $this->config['application_name'];
+        $clientId = $this->config['oauth2_client_id'];
+        $serviceAccountName = $this->config['service_account_name'];
+        $scopes = $this->config['scopes']['directory'];
+        $sub = (isset($this->config['sub'])) ? $this->config['sub'] : false;
+        $keyFileLocation = $this->config['key_file_location'];
         $key = file_get_contents($keyFileLocation);
 
         $cred = new \Google_Auth_AssertionCredentials(

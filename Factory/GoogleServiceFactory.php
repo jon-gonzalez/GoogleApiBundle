@@ -5,13 +5,12 @@ namespace HappyR\Google\ApiBundle\Factory;
 use HappyR\Google\ApiBundle\Factory\Exception\BadGoogleServiceDefinitionException;
 use HappyR\Google\ApiBundle\Services\AnalyticsService;
 use HappyR\Google\ApiBundle\Services\DirectoryService;
+use HappyR\Google\ApiBundle\Services\GoogleClient;
 use HappyR\Google\ApiBundle\Services\GoogleServiceInterface;
 use HappyR\Google\ApiBundle\Services\YoutubeService;
 
 /**
- * Class DirectoryService
- *
- * This is the class that communicates with directory api
+ * Class GoogleServiceFactory
  */
 class GoogleServiceFactory
 {
@@ -19,6 +18,7 @@ class GoogleServiceFactory
      * Create staticly desired Service
      *
      * @param string $service Type of Service to create
+     * @param GoogleClient $googleClient
      * @return GoogleServiceInterface Service instance
      * @throws BadGoogleServiceDefinitionException
      */
